@@ -1,0 +1,16 @@
+{
+    "name": "Codespaces with gcloud & Dify",
+    "build": {
+      "dockerfile": "Dockerfile",
+      "context": ".."
+    },
+    "extensions": [
+      "ms-vscode.go",
+      "googlecloudtools.cloudcode"
+    ],
+    "settings": {
+      "terminal.integrated.shell.linux": "/bin/bash"
+    },
+    "postCreateCommand": "gcloud init --skip-diagnostics"
+  }
+  
