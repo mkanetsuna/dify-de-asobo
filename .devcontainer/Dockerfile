@@ -19,27 +19,8 @@ RUN mkdir -p /usr/share/keyrings \
 # パッケージリストを更新し、Google Cloud SDK をインストール
 RUN apt-get update -y && apt-get install -y google-cloud-sdk
 
-# Docker CLI のインストール
-RUN apt-get update && \
-    apt-get install -y \
-    apt-transport-https \
-    ca-certificates \
-    curl \
-    gnupg-agent \
-    software-properties-common && \
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - && \
-    add-apt-repository \
-      "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
-      $(lsb_release -cs) \
-      stable" && \
-    apt-get update && \
-    apt-get install -y docker-ce-cli
-
 # クリーンアップ
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
-
-# ユーザーを docker グループに追加（必要に応じて）
-RUN usermod -aG docker vscode
 
 # デフォルトのシェルをbashに設定
 CMD ["bash"]
