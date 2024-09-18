@@ -11,14 +11,35 @@ RUN apt-get update && apt-get install -y \
     ca-certificates \
     git
 
-# Google Cloud SDKのリポジトリを追加
-RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list > /dev/null \
-    && curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - \
-    && apt-get update -y \
-    && apt-get install -y google-cloud-sdk
+# Google Cloud SDK のリポジトリを追加し、GPG 公開鍵を適切に設定
+RUN mkdir -p /usr/share/keyrings \
+    && curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg \
+    && echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | tee /etc/apt/sources.list.d/google-cloud-sdk.list
 
-# 不要なファイルをクリーンアップ
+# パッケージリストを更新し、Google Cloud SDK をインストール
+RUN apt-get update -y && apt-get install -y google-cloud-sdk
+
+# Docker CLI のインストール
+RUN apt-get update && \
+    apt-get install -y \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    gnupg-agent \
+    software-properties-common && \
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - && \
+    add-apt-repository \
+      "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+      $(lsb_release -cs) \
+      stable" && \
+    apt-get update && \
+    apt-get install -y docker-ce-cli
+
+# クリーンアップ
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# ユーザーを docker グループに追加（必要に応じて）
+RUN usermod -aG docker vscode
 
 # デフォルトのシェルをbashに設定
 CMD ["bash"]
